@@ -25,9 +25,11 @@ $(TESTS_HEADER): $(SOURCES)
 	$(PYTHON) $(PARSER_PY)
 
 $(BUILD_DIR)/%.o : %.c
-	$(CC) $(CFLAGS) -MMD -c $< -o $@
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -MMD -c -o $@ $<
 
 $(TARGET): $(OBJECTS)
+	@mkdir -p $(BUILD_DIR)
 	$(CC) $(OBJECTS) -o $@
 
 -include $(DEPENDS)
