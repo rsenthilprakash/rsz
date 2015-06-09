@@ -1,7 +1,8 @@
-#include <stdio.h>
-
+#include "resizer.h"
 #include "test_functions.h"
 #include "AllTests.h"
+
+#include <stdio.h>
 
 #define TEST(a, b) void b(void)
 #define IGNORE_TEST(a, b) void b(void)
@@ -27,18 +28,9 @@ static void cleanup(void)
 {
 }
 
-TEST(dummy, test_a)
+TEST(dummy, test_scale_factor_for_input_output_dimensions)
 {
-}
-
-TEST(dummy, test_b)
-{
-    CHECK(1);
-}
-
-TEST(dummy, test_c)
-{
-    CHECK(0);
+    CHECK(resizer_get_scale_factor(1920, 1280) == 1.5)
 }
 
 static void run_all_tests(void)
