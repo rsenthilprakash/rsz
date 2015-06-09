@@ -6,20 +6,13 @@ list_of_tests = []
 for root, dirs, files in os.walk(target_dir):
     for f in files:
         if '_test.c' in f:
-            #print os.path.join(root,f)
             cur_file = open(os.path.join(root, f), 'r')
             lines = cur_file.readlines()
             for line in lines:
-                if 'TEST' in line and '#define' not in line:
-                    #print line
+                if 'TEST' in line and '#define' not in line and 'IGNORE_TEST' not in line:
                     l_list = line.split(',')
-                    #print l_list[0][5:]
-                    #print l_list[1][1:-2]
                     list_of_tests.append(l_list[1][1:-2])
             cur_file.close()
-
-for l in list_of_tests:
-    print l
 
 f = open('AllTests.h', 'w');
 f.write('#ifndef ALL_TESTS_H_INCLUDED\n')
