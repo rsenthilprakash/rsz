@@ -22,6 +22,17 @@ static size_t check_count = 0;
         }                                                               \
     } while(0)
 
+#define COMPARE_IMAGES(out, exp, w, h)                  \
+    do {                                                \
+        if (!compare_images_fn(out, exp, w, h)) {       \
+            CHECK(false);                               \
+            print_image(out, w, h, "Output");           \
+            print_image(exp, w, h, "Expected");         \
+        }                                               \
+        else                                            \
+            CHECK(true);                                \
+    } while(0)
+
 static struct Resizer resizer;
 
 static void setup(void)
@@ -33,7 +44,7 @@ static void cleanup(void)
 {
 }
 
-static bool compare_images(const unsigned char * a, const unsigned char * b, unsigned int w, unsigned int h)
+static bool compare_images_fn(const unsigned char * a, const unsigned char * b, unsigned int w, unsigned int h)
 {
     unsigned int i;
     unsigned int j;
@@ -88,17 +99,24 @@ TEST(dummy, same_in_out_dimensions_does_not_alter_the_image)
 
     resizer_resize_frame(&resizer, out_image, in_image);
 
-    if (!compare_images(out_image, exp_out, 3, 3)) {
-        CHECK(false);
-        print_image(out_image, 3, 3, "Output");
-        print_image(in_image, 3, 3, "Expected");
-    }
-    else
-        CHECK(true);
+    COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
 
-IGNORE_TEST(dummy, dc_in_gives_same_dc_out_irrespective_of_scale)
+TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
 {
+    unsigned char in_image[] = {1, 1, 1,
+                                1, 1, 1,
+                                1, 1, 1};
+    unsigned char exp_out[] = {1, 1,
+                               1, 1};
+    unsigned char out_image[4];
+
+    resizer_set_input_dims(&resizer, 3, 3);
+    resizer_set_output_dims(&resizer, 2, 2);
+
+    resizer_resize_frame(&resizer, out_image, in_image);
+
+    COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
 
 static void run_all_tests(void)

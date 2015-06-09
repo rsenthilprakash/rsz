@@ -4,7 +4,8 @@ PYTHON=python
 CFLAGS=-std=c99 -Wall -Werror
 
 SOURCES = resizer_test.c \
-          resizer.c
+          resizer.c \
+          resizer_core.c \
 
 BUILD_DIR = _build
 
