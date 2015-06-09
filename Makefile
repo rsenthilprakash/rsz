@@ -6,14 +6,16 @@ CFLAGS=-std=c99 -Wall -Werror
 SOURCES = resizer_test.c \
           resizer.c
 
-OBJECTS = $(SOURCES:.c=.o)
-DEPENDS = $(SOURCES:.c=.d)
+BUILD_DIR = _build
+
+OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
+DEPENDS = $(OBJECTS:.o=.d)
 
 TESTS_HEADER = AllTests.h
 
 PARSER_PY = file_parse.py
 
-TARGET = resizer_test
+TARGET = $(BUILD_DIR)/resizer_test
 
 .PHONY: all
 all: $(TESTS_HEADER) $(TARGET)
@@ -22,7 +24,7 @@ all: $(TESTS_HEADER) $(TARGET)
 $(TESTS_HEADER): $(SOURCES)
 	$(PYTHON) $(PARSER_PY)
 
-$(OBJECTS): %.o : %.c
+$(BUILD_DIR)/%.o : %.c
 	$(CC) $(CFLAGS) -MMD -c $< -o $@
 
 $(TARGET): $(OBJECTS)
@@ -32,5 +34,5 @@ $(TARGET): $(OBJECTS)
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET)
+	rm -rf $(BUILD_DIR)
 	rm -f $(TESTS_HEADER)
