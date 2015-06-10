@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+static const unsigned int FIXED_PT_PRECISION_NUM_BITS = 8;
+static unsigned int get_fixed_point_precision(void)
+{
+    return FIXED_PT_PRECISION_NUM_BITS;
+}
+
 static inline unsigned char get_data_y(const unsigned char *ptr, int y)
 {
     return *(ptr + y);
@@ -12,8 +18,12 @@ void scale_planar_fixed(unsigned char *out_ptr, const unsigned char *in,
                         unsigned int out_width, unsigned int out_height, unsigned int out_stride,
                         unsigned int in_width, unsigned int in_height, unsigned int in_stride)
 {
-    unsigned int scale_x = (in_height << 8) / out_height;
-    unsigned int scale_y = (in_width << 8) / out_width;
+    const unsigned int FIX_SHIFT = get_fixed_point_precision();
+    const unsigned int DOUBLE_FIX_SHIFT = 2 * FIX_SHIFT;
+    const unsigned int FIX_UNITY = 1 << FIX_SHIFT;
+
+    unsigned int scale_x = (in_height << FIX_SHIFT) / out_height;
+    unsigned int scale_y = (in_width << FIX_SHIFT) / out_width;
     unsigned int i;
     unsigned int j;
     unsigned char *out;
@@ -26,9 +36,9 @@ void scale_planar_fixed(unsigned char *out_ptr, const unsigned char *in,
     unsigned int out_data;
 
     for (i = 0; i < out_height; i++) {
-        int fx = x >> 8;
-        int rx = x - (fx << 8);
-        int rx_1 = 256 - rx;
+        int fx = x >> FIX_SHIFT;
+        int rx = x - (fx << FIX_SHIFT);
+        int rx_1 = FIX_UNITY - rx;
 
         memcpy(line_in_0, in + (fx * in_stride), in_width);
         line_in_0[in_width] = *(in + (fx * in_stride) + in_width - 1);
@@ -44,9 +54,9 @@ void scale_planar_fixed(unsigned char *out_ptr, const unsigned char *in,
 
         y = 0;
         for (j = 0; j < out_width; j++) {
-            int fy = y >> 8;
+            int fy = y >> FIX_SHIFT;
             int ry = y & 0xff;
-            int ry_1 = 256 - ry;
+            int ry_1 = FIX_UNITY - ry;
 
             data_11 = get_data_y(line_in_0, fy);
             data_21 = get_data_y(line_in_1, fy);
@@ -56,7 +66,7 @@ void scale_planar_fixed(unsigned char *out_ptr, const unsigned char *in,
                 data_22 = get_data_y(line_in_1, fy + 1);
                 out_data += (data_12 * rx_1 + data_22 * rx) * ry;
             }
-            *out++ = (unsigned char) (out_data >> 16);
+            *out++ = (unsigned char) (out_data >> DOUBLE_FIX_SHIFT);
 
             y += scale_y;
         }
