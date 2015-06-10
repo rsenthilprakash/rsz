@@ -119,6 +119,54 @@ TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
     COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
 
+TEST(dummy, set_a_valid_input_crop)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 2, 2) == true);
+}
+
+TEST(dummy, set_input_crop_same_as_input_dim)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 4, 4) == true);
+}
+
+TEST(dummy, invalid_input_crop_top_left_x)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, -1, 0, 2, 2) == false);
+}
+
+TEST(dummy, invalid_input_crop_top_left_y)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, 0, -1, 2, 2) == false);
+}
+
+TEST(dummy, invalid_input_crop_bottom_left_x)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 5, 2) == false);
+}
+
+TEST(dummy, invalid_input_crop_bottom_left_y)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 2, 5) == false);
+}
+
+TEST(dummy, invalid_input_crop_top_left_x_less_than_or_equal_to_bottom_left_x)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, 2, 0, 2, 2) == false);
+}
+
+TEST(dummy, invalid_input_crop_top_left_y_less_than_or_equal_to_bottom_left_y)
+{
+    resizer_set_input_dims(&resizer, 4, 4);
+    CHECK(resizer_validate_and_set_crop(&resizer, 0, 2, 2, 2) == false);
+}
+
 static void run_all_tests(void)
 {
     size_t total = sizeof test_functions / sizeof test_functions[0];

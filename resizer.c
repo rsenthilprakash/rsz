@@ -20,6 +20,33 @@ double resizer_get_scale_factor(const struct Resizer * r)
     return (double)r->in_width / r->out_width;
 }
 
+bool resizer_validate_and_set_crop(struct Resizer * r, unsigned int tl_x, unsigned int tl_y,
+                                   unsigned int br_x, unsigned int br_y)
+{
+    bool crop_valid = true;
+
+    if (tl_x > r->in_width)
+        crop_valid = false;
+    else if (br_x > r->in_width)
+        crop_valid = false;
+    else if (br_x <= tl_x)
+        crop_valid = false;
+    else if (tl_y > r->in_height)
+        crop_valid = false;
+    else if (br_y > r->in_height)
+        crop_valid = false;
+    else if (br_y <= tl_y)
+        crop_valid = false;
+    else {
+        r->in_crop_tl_x = tl_x;
+        r->in_crop_tl_y = tl_y;
+        r->in_crop_br_x = br_x;
+        r->in_crop_br_y = br_y;
+    }
+
+    return crop_valid;
+}
+
 static void copy_input_to_output(unsigned char *output, const unsigned char *input,
                                  unsigned int width, unsigned int height)
 {
