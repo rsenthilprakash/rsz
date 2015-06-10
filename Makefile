@@ -19,20 +19,25 @@ PARSER_PY = file_parse.py
 
 TARGET = $(BUILD_DIR)/resizer_test
 
+QUIET = @
+
 .PHONY: all
 all: $(TESTS_HEADER) $(TARGET)
 	./$(TARGET)
 
 $(TESTS_HEADER): $(TESTS_SOURCE)
-	$(PYTHON) $(PARSER_PY)
+	@echo GEN $@
+	@$(PYTHON) $(PARSER_PY)
 
 $(BUILD_DIR)/%.o : %.c
 	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) -MMD -c -o $@ $<
+	@echo CC $@
+	@$(CC) $(CFLAGS) -MMD -c -o $@ $<
 
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(BUILD_DIR)
-	$(CC) $(OBJECTS) -o $@
+	@echo LD $@
+	@$(CC) $(OBJECTS) -o $@
 
 -include $(DEPENDS)
 
