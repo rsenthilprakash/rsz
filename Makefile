@@ -3,7 +3,8 @@ PYTHON=python
 
 CFLAGS=-std=c99 -Wall -Werror
 
-SOURCES = resizer_test.c \
+TESTS_SOURCE = resizer_test.c
+SOURCES = $(TESTS_SOURCE) \
           resizer.c \
           resizer_core.c \
 
@@ -22,7 +23,7 @@ TARGET = $(BUILD_DIR)/resizer_test
 all: $(TESTS_HEADER) $(TARGET)
 	./$(TARGET)
 
-$(TESTS_HEADER): $(SOURCES)
+$(TESTS_HEADER): $(TESTS_SOURCE)
 	$(PYTHON) $(PARSER_PY)
 
 $(BUILD_DIR)/%.o : %.c
