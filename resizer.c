@@ -47,9 +47,8 @@ bool resizer_validate_and_set_crop(struct Resizer * r, unsigned int tl_x, unsign
         r->in_crop_tl_y = tl_y;
         r->in_crop_br_x = br_x;
         r->in_crop_br_y = br_y;
+        r->crop_valid = true;
     }
-
-    r->crop_valid = true;
 
     return crop_valid;
 }
@@ -63,7 +62,7 @@ void resizer_set_full_input_crop(struct Resizer * r)
     r->crop_valid = true;
 }
 
-static void copy_input_to_output(unsigned char *output, const unsigned char *input,
+static void copy_input_to_output(unsigned char * output, const unsigned char * input,
                                  unsigned int width, unsigned int height)
 {
     unsigned int i;
