@@ -1,5 +1,12 @@
 import os
-target_dir = '.'
+import sys
+
+if len(sys.argv) == 3:
+    target_dir = sys.argv[1]
+    header_name = sys.argv[2]
+else:
+    target_dir = '.'
+    header_name = 'AllTests.h'
 
 list_of_tests = []
 
@@ -14,7 +21,7 @@ for root, dirs, files in os.walk(target_dir):
                     list_of_tests.append(l_list[1][1:-2])
             cur_file.close()
 
-f = open('AllTests.h', 'w');
+f = open(header_name, 'w');
 f.write('#ifndef ALL_TESTS_H_INCLUDED\n')
 f.write('#define ALL_TESTS_H_INCLUDED\n')
 f.write('#include "test_functions.h"\n')

@@ -1,4 +1,4 @@
-#include "resizer.h"
+#include <resizer.h>
 #include "resizer_core.h"
 
 #include <string.h>
