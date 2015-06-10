@@ -3,6 +3,11 @@
 
 #include <string.h>
 
+void resizer_init(struct Resizer * r)
+{
+    r->crop_valid = false;
+}
+
 void resizer_set_input_dims(struct Resizer * r, unsigned int width, unsigned int height)
 {
     r->in_width = width;
@@ -44,7 +49,18 @@ bool resizer_validate_and_set_crop(struct Resizer * r, unsigned int tl_x, unsign
         r->in_crop_br_y = br_y;
     }
 
+    r->crop_valid = true;
+
     return crop_valid;
+}
+
+void resizer_set_full_input_crop(struct Resizer * r)
+{
+    r->in_crop_tl_x = 0;
+    r->in_crop_tl_y = 0;
+    r->in_crop_br_x = r->in_width;
+    r->in_crop_br_y = r->in_height;
+    r->crop_valid = true;
 }
 
 static void copy_input_to_output(unsigned char *output, const unsigned char *input,
@@ -61,15 +77,29 @@ static void copy_input_to_output(unsigned char *output, const unsigned char *inp
     }
 }
 
-void resizer_resize_frame(const struct Resizer * r, unsigned char * output,
-                          const unsigned char * input)
+enum ResizerStatus resizer_resize_frame(const struct Resizer * r, unsigned char * output,
+                                        const unsigned char * input)
 {
-    if((r->out_width == r->in_width) &&
-       (r->out_height == r->in_height)) {
-        copy_input_to_output(output, input, r->in_width, r->in_height);
+    unsigned int in_crop_width;
+    unsigned int in_crop_height;
+
+    if (!output || !input)
+        return RESIZER_FAILURE;
+
+    if (!r->crop_valid)
+        return RESIZER_FAILURE;
+
+    in_crop_width = r->in_crop_br_x - r->in_crop_tl_x;
+    in_crop_height = r->in_crop_br_y - r->in_crop_tl_y;
+
+    if((r->out_width == in_crop_width) &&
+       (r->out_height == in_crop_height)) {
+        copy_input_to_output(output, input, in_crop_width, in_crop_height);
     }
     else {
         scale_planar_fixed(output, input, r->out_width, r->out_height, r->out_width,
-                           r->in_width, r->in_height, r->in_width);
+                           in_crop_width, in_crop_height, r->in_width);
     }
+
+    return RESIZER_SUCCESS;
 }

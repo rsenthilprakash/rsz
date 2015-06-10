@@ -38,6 +38,7 @@ static struct Resizer resizer;
 static void setup(void)
 {
     memset(&resizer, 0, sizeof (resizer));
+    resizer_init(&resizer);
 }
 
 static void cleanup(void)
@@ -82,41 +83,6 @@ TEST(dummy, test_scale_factor_for_input_output_dimensions)
     resizer_set_output_dims(&resizer, 1280, 720);
 
     CHECK(resizer_get_scale_factor(&resizer) == 1.5);
-}
-
-TEST(dummy, same_in_out_dimensions_does_not_alter_the_image)
-{
-    unsigned char in_image[] = {1, 1, 1,
-                                1, 1, 1,
-                                1, 1, 1};
-    unsigned char exp_out[] = {1, 1, 1,
-                               1, 1, 1,
-                               1, 1, 1};
-    unsigned char out_image[9];
-
-    resizer_set_input_dims(&resizer, 3, 3);
-    resizer_set_output_dims(&resizer, 3, 3);
-
-    resizer_resize_frame(&resizer, out_image, in_image);
-
-    COMPARE_IMAGES(out_image, exp_out, 3, 3);
-}
-
-TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
-{
-    unsigned char in_image[] = {1, 1, 1,
-                                1, 1, 1,
-                                1, 1, 1};
-    unsigned char exp_out[] = {1, 1,
-                               1, 1};
-    unsigned char out_image[4];
-
-    resizer_set_input_dims(&resizer, 3, 3);
-    resizer_set_output_dims(&resizer, 2, 2);
-
-    resizer_resize_frame(&resizer, out_image, in_image);
-
-    COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
 
 TEST(dummy, set_a_valid_input_crop)
@@ -166,6 +132,57 @@ TEST(dummy, invalid_input_crop_top_left_y_less_than_or_equal_to_bottom_left_y)
     resizer_set_input_dims(&resizer, 4, 4);
     CHECK(resizer_validate_and_set_crop(&resizer, 0, 2, 2, 2) == false);
 }
+
+TEST(dummy, resizing_without_valid_crop_fails)
+{
+    unsigned char in_image[] = {1, 1, 1,
+                                1, 1, 1,
+                                1, 1, 1};
+    unsigned char out_image[9];
+
+    resizer_set_input_dims(&resizer, 3, 3);
+    resizer_set_output_dims(&resizer, 3, 3);
+
+    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_FAILURE);
+}
+
+TEST(dummy, same_in_out_dimensions_does_not_alter_the_image)
+{
+    unsigned char in_image[] = {1, 1, 1,
+                                1, 1, 1,
+                                1, 1, 1};
+    unsigned char exp_out[] = {1, 1, 1,
+                               1, 1, 1,
+                               1, 1, 1};
+    unsigned char out_image[9];
+
+    resizer_set_input_dims(&resizer, 3, 3);
+    resizer_set_output_dims(&resizer, 3, 3);
+    resizer_set_full_input_crop(&resizer);
+
+    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_SUCCESS);
+
+    COMPARE_IMAGES(out_image, exp_out, 3, 3);
+}
+
+TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
+{
+    unsigned char in_image[] = {1, 1, 1,
+                                1, 1, 1,
+                                1, 1, 1};
+    unsigned char exp_out[] = {1, 1,
+                               1, 1};
+    unsigned char out_image[4];
+
+    resizer_set_input_dims(&resizer, 3, 3);
+    resizer_set_output_dims(&resizer, 2, 2);
+    resizer_set_full_input_crop(&resizer);
+
+    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_SUCCESS);
+
+    COMPARE_IMAGES(out_image, exp_out, 2, 2);
+}
+
 
 static void run_all_tests(void)
 {
