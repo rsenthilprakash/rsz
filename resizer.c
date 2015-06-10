@@ -20,11 +20,6 @@ void resizer_set_output_dims(struct Resizer * r, unsigned int width, unsigned in
     r->out_height = height;
 }
 
-double resizer_get_scale_factor(const struct Resizer * r)
-{
-    return (double)r->in_width / r->out_width;
-}
-
 bool resizer_validate_and_set_crop(struct Resizer * r, unsigned int tl_x, unsigned int tl_y,
                                    unsigned int br_x, unsigned int br_y)
 {
@@ -60,6 +55,21 @@ void resizer_set_full_input_crop(struct Resizer * r)
     r->in_crop_br_x = r->in_width;
     r->in_crop_br_y = r->in_height;
     r->crop_valid = true;
+}
+
+double resizer_get_scale_factor(const struct Resizer * r)
+{
+    double scale_factor;
+    unsigned int in_crop_width;
+
+    if (!r->crop_valid)
+        scale_factor = -1;
+    else {
+        in_crop_width = r->in_crop_br_x - r->in_crop_tl_x;
+        scale_factor = (double)in_crop_width / r->out_width;
+    }
+
+    return scale_factor;
 }
 
 static void copy_input_to_output(unsigned char * output, const unsigned char * input,

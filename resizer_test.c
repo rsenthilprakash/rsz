@@ -77,14 +77,6 @@ static void print_image(const unsigned char * img, unsigned int w, unsigned int 
     }
 }
 
-TEST(dummy, test_scale_factor_for_input_output_dimensions)
-{
-    resizer_set_input_dims(&resizer, 1920, 1080);
-    resizer_set_output_dims(&resizer, 1280, 720);
-
-    CHECK(resizer_get_scale_factor(&resizer) == 1.5);
-}
-
 TEST(dummy, set_a_valid_input_crop)
 {
     resizer_set_input_dims(&resizer, 4, 4);
@@ -131,6 +123,23 @@ TEST(dummy, invalid_input_crop_top_left_y_less_than_or_equal_to_bottom_left_y)
 {
     resizer_set_input_dims(&resizer, 4, 4);
     CHECK(resizer_validate_and_set_crop(&resizer, 0, 2, 2, 2) == false);
+}
+
+TEST(dummy, invalid_scale_factor_for_invalid_input_crop)
+{
+    resizer_set_input_dims(&resizer, 1920, 1080);
+    resizer_set_output_dims(&resizer, 1280, 720);
+
+    CHECK(resizer_get_scale_factor(&resizer) == -1);
+}
+
+TEST(dummy, test_scale_factor_for_input_output_dimensions)
+{
+    resizer_set_input_dims(&resizer, 1920, 1080);
+    resizer_set_output_dims(&resizer, 1280, 720);
+    resizer_set_full_input_crop(&resizer);
+
+    CHECK(resizer_get_scale_factor(&resizer) == 1.5);
 }
 
 TEST(dummy, resizing_without_valid_crop_fails)
