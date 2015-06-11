@@ -52,8 +52,8 @@ void resizer_set_full_input_crop(struct Resizer * r)
 {
     r->in_crop_tl_x = 0;
     r->in_crop_tl_y = 0;
-    r->in_crop_br_x = r->in_width;
-    r->in_crop_br_y = r->in_height;
+    r->in_crop_br_x = r->in_width - 1;
+    r->in_crop_br_y = r->in_height - 1;
     r->crop_valid = true;
 }
 
@@ -65,7 +65,7 @@ double resizer_get_scale_factor(const struct Resizer * r)
     if (!r->crop_valid)
         scale_factor = -1;
     else {
-        in_crop_width = r->in_crop_br_x - r->in_crop_tl_x;
+        in_crop_width = r->in_crop_br_x - r->in_crop_tl_x + 1;
         scale_factor = (double)in_crop_width / r->out_width;
     }
 
@@ -91,6 +91,7 @@ enum ResizerStatus resizer_resize_frame(const struct Resizer * r, unsigned char 
 {
     unsigned int in_crop_width;
     unsigned int in_crop_height;
+    const unsigned char *in_crop_buf;
 
     if (!output || !input)
         return RESIZER_FAILURE;
@@ -98,15 +99,16 @@ enum ResizerStatus resizer_resize_frame(const struct Resizer * r, unsigned char 
     if (!r->crop_valid)
         return RESIZER_FAILURE;
 
-    in_crop_width = r->in_crop_br_x - r->in_crop_tl_x;
-    in_crop_height = r->in_crop_br_y - r->in_crop_tl_y;
+    in_crop_width = r->in_crop_br_x - r->in_crop_tl_x + 1;
+    in_crop_height = r->in_crop_br_y - r->in_crop_tl_y + 1;
+    in_crop_buf = input + (r->in_crop_tl_y * r->in_width) + r->in_crop_tl_x;
 
     if((r->out_width == in_crop_width) &&
        (r->out_height == in_crop_height)) {
         copy_input_to_output(output, input, in_crop_width, in_crop_height);
     }
     else {
-        scale_planar_fixed(output, input, r->out_width, r->out_height, r->out_width,
+        scale_planar_fixed(output, in_crop_buf, r->out_width, r->out_height, r->out_width,
                            in_crop_width, in_crop_height, r->in_width);
     }
 

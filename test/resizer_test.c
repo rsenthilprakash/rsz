@@ -192,6 +192,24 @@ TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
     COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
 
+TEST(dummy, upscale_with_crop_for_scale_of_2_by_3)
+{
+    unsigned char in_image[] = {1, 1, 1,
+                                1, 2, 2,
+                                1, 2, 2};
+    unsigned char exp_out[] = {2, 2, 2,
+                               2, 2, 2,
+                               2, 2, 2};
+    unsigned char out_image[9];
+
+    resizer_set_input_dims(&resizer, 3, 3);
+    resizer_set_output_dims(&resizer, 3, 3);
+
+    CHECK(resizer_validate_and_set_crop(&resizer, 1, 1, 2, 2) == true);
+    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_SUCCESS);
+
+    COMPARE_IMAGES(out_image, exp_out, 3, 3);
+}
 
 static void run_all_tests(void)
 {
