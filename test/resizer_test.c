@@ -33,16 +33,16 @@ static size_t check_count = 0;
             CHECK(true);                                \
     } while(0)
 
-static struct Resizer resizer;
+static struct Resizer * resizer;
 
 static void setup(void)
 {
-    memset(&resizer, 0, sizeof (resizer));
-    resizer_init(&resizer);
+    resizer = resizer_create();
 }
 
 static void cleanup(void)
 {
+    resizer_destroy(resizer);
 }
 
 static bool compare_images_fn(const unsigned char * a, const unsigned char * b, unsigned int w, unsigned int h)
@@ -76,67 +76,67 @@ static void print_image(const unsigned char * img, unsigned int w, unsigned int 
 
 TEST(dummy, set_a_valid_input_crop)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 2, 2) == true);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 2, 2) == true);
 }
 
 TEST(dummy, set_input_crop_same_as_input_dim)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 4, 4) == true);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 4, 4) == true);
 }
 
 TEST(dummy, invalid_input_crop_top_left_x)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, -1, 0, 2, 2) == false);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, -1, 0, 2, 2) == false);
 }
 
 TEST(dummy, invalid_input_crop_top_left_y)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, 0, -1, 2, 2) == false);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, 0, -1, 2, 2) == false);
 }
 
 TEST(dummy, invalid_input_crop_bottom_left_x)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 5, 2) == false);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 5, 2) == false);
 }
 
 TEST(dummy, invalid_input_crop_bottom_left_y)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, 0, 0, 2, 5) == false);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 2, 5) == false);
 }
 
 TEST(dummy, invalid_input_crop_top_left_x_less_than_or_equal_to_bottom_left_x)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, 2, 0, 2, 2) == false);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, 2, 0, 2, 2) == false);
 }
 
 TEST(dummy, invalid_input_crop_top_left_y_less_than_or_equal_to_bottom_left_y)
 {
-    resizer_set_input_dims(&resizer, 4, 4, 4);
-    CHECK(resizer_validate_and_set_crop(&resizer, 0, 2, 2, 2) == false);
+    resizer_set_input_dims(resizer, 4, 4, 4);
+    CHECK(resizer_validate_and_set_crop(resizer, 0, 2, 2, 2) == false);
 }
 
 TEST(dummy, invalid_scale_factor_for_invalid_input_crop)
 {
-    resizer_set_input_dims(&resizer, 1920, 1080, 1920);
-    resizer_set_output_dims(&resizer, 1280, 720, 1280);
+    resizer_set_input_dims(resizer, 1920, 1080, 1920);
+    resizer_set_output_dims(resizer, 1280, 720, 1280);
 
-    CHECK(resizer_get_scale_factor(&resizer) == -1);
+    CHECK(resizer_get_scale_factor(resizer) == -1);
 }
 
 TEST(dummy, test_scale_factor_for_input_output_dimensions)
 {
-    resizer_set_input_dims(&resizer, 1920, 1080, 1920);
-    resizer_set_output_dims(&resizer, 1280, 720, 1280);
-    resizer_set_full_input_crop(&resizer);
+    resizer_set_input_dims(resizer, 1920, 1080, 1920);
+    resizer_set_output_dims(resizer, 1280, 720, 1280);
+    resizer_set_full_input_crop(resizer);
 
-    CHECK(resizer_get_scale_factor(&resizer) == 1.5);
+    CHECK(resizer_get_scale_factor(resizer) == 1.5);
 }
 
 TEST(dummy, resizing_without_valid_crop_fails)
@@ -146,10 +146,10 @@ TEST(dummy, resizing_without_valid_crop_fails)
                                 1, 1, 1};
     unsigned char out_image[9];
 
-    resizer_set_input_dims(&resizer, 3, 3, 3);
-    resizer_set_output_dims(&resizer, 3, 3, 3);
+    resizer_set_input_dims(resizer, 3, 3, 3);
+    resizer_set_output_dims(resizer, 3, 3, 3);
 
-    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_FAILURE);
+    CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_FAILURE);
 }
 
 TEST(dummy, same_in_out_dimensions_does_not_alter_the_image)
@@ -162,11 +162,11 @@ TEST(dummy, same_in_out_dimensions_does_not_alter_the_image)
                                7, 8, 9};
     unsigned char out_image[9];
 
-    resizer_set_input_dims(&resizer, 3, 3, 3);
-    resizer_set_output_dims(&resizer, 3, 3, 3);
-    resizer_set_full_input_crop(&resizer);
+    resizer_set_input_dims(resizer, 3, 3, 3);
+    resizer_set_output_dims(resizer, 3, 3, 3);
+    resizer_set_full_input_crop(resizer);
 
-    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_SUCCESS);
+    CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_SUCCESS);
 
     COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
@@ -180,11 +180,11 @@ TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
                                1, 1};
     unsigned char out_image[4];
 
-    resizer_set_input_dims(&resizer, 3, 3, 3);
-    resizer_set_output_dims(&resizer, 2, 2, 2);
-    resizer_set_full_input_crop(&resizer);
+    resizer_set_input_dims(resizer, 3, 3, 3);
+    resizer_set_output_dims(resizer, 2, 2, 2);
+    resizer_set_full_input_crop(resizer);
 
-    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_SUCCESS);
+    CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_SUCCESS);
 
     COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
@@ -199,11 +199,11 @@ TEST(dummy, upscale_with_crop_for_scale_of_2_by_3)
                                2, 2, 2};
     unsigned char out_image[9];
 
-    resizer_set_input_dims(&resizer, 3, 3, 3);
-    resizer_set_output_dims(&resizer, 3, 3, 3);
+    resizer_set_input_dims(resizer, 3, 3, 3);
+    resizer_set_output_dims(resizer, 3, 3, 3);
 
-    CHECK(resizer_validate_and_set_crop(&resizer, 1, 1, 2, 2) == true);
-    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_SUCCESS);
+    CHECK(resizer_validate_and_set_crop(resizer, 1, 1, 2, 2) == true);
+    CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_SUCCESS);
 
     COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
@@ -217,11 +217,11 @@ TEST(dummy, only_crop_implies_a_copy)
                                4, 5};
     unsigned char out_image[4];
 
-    resizer_set_input_dims(&resizer, 3, 3, 3);
-    resizer_set_output_dims(&resizer, 2, 2, 2);
+    resizer_set_input_dims(resizer, 3, 3, 3);
+    resizer_set_output_dims(resizer, 2, 2, 2);
 
-    CHECK(resizer_validate_and_set_crop(&resizer, 1, 1, 2, 2) == true);
-    CHECK(resizer_resize_frame(&resizer, out_image, in_image) == RESIZER_SUCCESS);
+    CHECK(resizer_validate_and_set_crop(resizer, 1, 1, 2, 2) == true);
+    CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_SUCCESS);
 
     COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }

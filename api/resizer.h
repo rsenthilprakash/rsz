@@ -3,26 +3,15 @@
 
 #include <stdbool.h>
 
-struct Resizer {
-    unsigned int in_width;
-    unsigned int in_height;
-    unsigned int in_stride;
-    unsigned int out_width;
-    unsigned int out_height;
-    unsigned int out_stride;
-    unsigned int in_crop_tl_x;
-    unsigned int in_crop_tl_y;
-    unsigned int in_crop_br_x;
-    unsigned int in_crop_br_y;
-    bool crop_valid;
-};
+struct Resizer;
 
 enum ResizerStatus {
     RESIZER_SUCCESS,
     RESIZER_FAILURE,
 };
 
-void resizer_init(struct Resizer * r);
+struct Resizer * resizer_create(void);
+void resizer_destroy(struct Resizer * r);
 
 void resizer_set_input_dims(struct Resizer * r, unsigned int width, unsigned int height,
                             unsigned int stride);

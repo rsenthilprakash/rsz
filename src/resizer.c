@@ -1,11 +1,36 @@
 #include <resizer.h>
 #include "resizer_core.h"
 
+#include <stdlib.h>
 #include <string.h>
 
-void resizer_init(struct Resizer * r)
+struct Resizer {
+    unsigned int in_width;
+    unsigned int in_height;
+    unsigned int in_stride;
+    unsigned int out_width;
+    unsigned int out_height;
+    unsigned int out_stride;
+    unsigned int in_crop_tl_x;
+    unsigned int in_crop_tl_y;
+    unsigned int in_crop_br_x;
+    unsigned int in_crop_br_y;
+    bool crop_valid;
+};
+
+/* TODO: Error handling in the create and destroy functions */
+struct Resizer * resizer_create(void)
 {
+    struct Resizer * r = calloc(1, sizeof(* r));
     r->crop_valid = false;
+
+    return r;
+}
+
+void resizer_destroy(struct Resizer * r)
+{
+    if (r)
+        free(r);
 }
 
 void resizer_set_input_dims(struct Resizer * r, unsigned int width, unsigned int height,
