@@ -226,6 +226,48 @@ TEST(dummy, only_crop_implies_a_copy)
     COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
 
+TEST(dummy, very_simple_downscale_for_scale_of_5_by_3)
+{
+    unsigned char in_image[] = {1, 3, 3, 4, 4,
+                                6, 9, 9, 5, 5,
+                                6, 9, 9, 5, 5,
+                                4, 7, 7, 8, 8,
+                                4, 7, 7, 8, 8};
+    unsigned char exp_out[] = {1, 3, 4,
+                               6, 9, 5,
+                               4, 7, 8};
+    unsigned char out_image[9];
+
+    resizer_set_input_dims(resizer, 5, 5, 5);
+    resizer_set_output_dims(resizer, 3, 3, 3);
+    resizer_set_full_input_crop(resizer);
+
+    CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_SUCCESS);
+
+    COMPARE_IMAGES(out_image, exp_out, 3, 3);
+}
+
+TEST(dummy, not_so_simple_downscale_for_scale_of_5_by_3)
+{
+    unsigned char in_image[] = {1, 7, 10, 12, 6,
+                                2, 9, 2, 2, 4,
+                                11, 3, 2, 10, 3,
+                                10, 3, 8, 11, 8,
+                                1, 1, 3, 5, 2};
+    unsigned char exp_out[] = {1, 9, 10,
+                               8, 3, 6,
+                               7, 5, 8};
+    unsigned char out_image[9];
+
+    resizer_set_input_dims(resizer, 5, 5, 5);
+    resizer_set_output_dims(resizer, 3, 3, 3);
+    resizer_set_full_input_crop(resizer);
+
+    CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_SUCCESS);
+
+    COMPARE_IMAGES(out_image, exp_out, 3, 3);
+}
+
 static void run_all_tests(void)
 {
     size_t total = sizeof test_functions / sizeof test_functions[0];
