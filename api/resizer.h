@@ -6,8 +6,10 @@
 struct Resizer {
     unsigned int in_width;
     unsigned int in_height;
+    unsigned int in_stride;
     unsigned int out_width;
     unsigned int out_height;
+    unsigned int out_stride;
     unsigned int in_crop_tl_x;
     unsigned int in_crop_tl_y;
     unsigned int in_crop_br_x;
@@ -22,8 +24,10 @@ enum ResizerStatus {
 
 void resizer_init(struct Resizer * r);
 
-void resizer_set_input_dims(struct Resizer * r, unsigned int width, unsigned int height);
-void resizer_set_output_dims(struct Resizer * r, unsigned int width, unsigned int height);
+void resizer_set_input_dims(struct Resizer * r, unsigned int width, unsigned int height,
+                            unsigned int stride);
+void resizer_set_output_dims(struct Resizer * r, unsigned int width, unsigned int height,
+                             unsigned int stride);
 
 /* scale factor: for dowlscale is > 1 and for upscale is < 1, invalid: -1 */
 double resizer_get_scale_factor(const struct Resizer * r);
