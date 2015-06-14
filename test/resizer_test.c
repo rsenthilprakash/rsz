@@ -1,4 +1,5 @@
 #include <resizer.h>
+#include <framer.h>
 #include "test_functions.h"
 #include "AllTests.h"
 
@@ -268,17 +269,35 @@ TEST(resizer, not_so_simple_downscale_for_scale_of_5_by_3)
     COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
 
+static struct Framer * framer;
+
 void framer_setup(void)
 {
+    framer = framer_create();
 }
 
 void framer_cleanup(void)
 {
+    framer_destroy(framer);
 }
 
-TEST(framer, dummy_framer_test)
+TEST(framer, framer_full_crop_has_proper_box)
 {
-    CHECK(true);
+    unsigned int width = 1920;
+    unsigned int height = 1080;
+    unsigned int tl_x;
+    unsigned int tl_y;
+    unsigned int br_x;
+    unsigned int br_y;
+
+    framer_set_width_and_height(framer, width, height);
+    framer_set_full_crop(framer);
+    framer_get_current_crop(framer, &tl_x, &tl_y, &br_x, &br_y);
+
+    CHECK(tl_x == 0);
+    CHECK(tl_y == 0);
+    CHECK(br_x == width - 1);
+    CHECK(br_y == height - 1);
 }
 
 static void run_all_tests(void)

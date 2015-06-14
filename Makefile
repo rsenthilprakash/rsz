@@ -14,6 +14,7 @@ TESTS_PARSER_PY = $(TESTS_DIR)/file_parse.py
 SOURCES_DIR = src
 SOURCES = resizer.c \
           resizer_core.c \
+          framer.c \
 
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 DEPENDS = $(OBJECTS:.o=.d)
