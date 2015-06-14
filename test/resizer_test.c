@@ -35,12 +35,12 @@ static size_t check_count = 0;
 
 static struct Resizer * resizer;
 
-static void setup(void)
+void resizer_setup(void)
 {
     resizer = resizer_create();
 }
 
-static void cleanup(void)
+void resizer_cleanup(void)
 {
     resizer_destroy(resizer);
 }
@@ -74,55 +74,55 @@ static void print_image(const unsigned char * img, unsigned int w, unsigned int 
     }
 }
 
-TEST(dummy, set_a_valid_input_crop)
+TEST(resizer, set_a_valid_input_crop)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 2, 2) == true);
 }
 
-TEST(dummy, set_input_crop_same_as_input_dim)
+TEST(resizer, set_input_crop_same_as_input_dim)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 4, 4) == true);
 }
 
-TEST(dummy, invalid_input_crop_top_left_x)
+TEST(resizer, invalid_input_crop_top_left_x)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, -1, 0, 2, 2) == false);
 }
 
-TEST(dummy, invalid_input_crop_top_left_y)
+TEST(resizer, invalid_input_crop_top_left_y)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, 0, -1, 2, 2) == false);
 }
 
-TEST(dummy, invalid_input_crop_bottom_left_x)
+TEST(resizer, invalid_input_crop_bottom_left_x)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 5, 2) == false);
 }
 
-TEST(dummy, invalid_input_crop_bottom_left_y)
+TEST(resizer, invalid_input_crop_bottom_left_y)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, 0, 0, 2, 5) == false);
 }
 
-TEST(dummy, invalid_input_crop_top_left_x_less_than_or_equal_to_bottom_left_x)
+TEST(resizer, invalid_input_crop_top_left_x_less_than_or_equal_to_bottom_left_x)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, 2, 0, 2, 2) == false);
 }
 
-TEST(dummy, invalid_input_crop_top_left_y_less_than_or_equal_to_bottom_left_y)
+TEST(resizer, invalid_input_crop_top_left_y_less_than_or_equal_to_bottom_left_y)
 {
     resizer_set_input_dims(resizer, 4, 4, 4);
     CHECK(resizer_validate_and_set_crop(resizer, 0, 2, 2, 2) == false);
 }
 
-TEST(dummy, invalid_scale_factor_for_invalid_input_crop)
+TEST(resizer, invalid_scale_factor_for_invalid_input_crop)
 {
     resizer_set_input_dims(resizer, 1920, 1080, 1920);
     resizer_set_output_dims(resizer, 1280, 720, 1280);
@@ -130,7 +130,7 @@ TEST(dummy, invalid_scale_factor_for_invalid_input_crop)
     CHECK(resizer_get_scale_factor(resizer) == -1);
 }
 
-TEST(dummy, test_scale_factor_for_input_output_dimensions)
+TEST(resizer, test_scale_factor_for_input_output_dimensions)
 {
     resizer_set_input_dims(resizer, 1920, 1080, 1920);
     resizer_set_output_dims(resizer, 1280, 720, 1280);
@@ -139,7 +139,7 @@ TEST(dummy, test_scale_factor_for_input_output_dimensions)
     CHECK(resizer_get_scale_factor(resizer) == 1.5);
 }
 
-TEST(dummy, resizing_without_valid_crop_fails)
+TEST(resizer, resizing_without_valid_crop_fails)
 {
     unsigned char in_image[] = {1, 1, 1,
                                 1, 1, 1,
@@ -152,7 +152,7 @@ TEST(dummy, resizing_without_valid_crop_fails)
     CHECK(resizer_resize_frame(resizer, out_image, in_image) == RESIZER_FAILURE);
 }
 
-TEST(dummy, same_in_out_dimensions_does_not_alter_the_image)
+TEST(resizer, same_in_out_dimensions_does_not_alter_the_image)
 {
     unsigned char in_image[] = {1, 2, 3,
                                 4, 5, 6,
@@ -171,7 +171,7 @@ TEST(dummy, same_in_out_dimensions_does_not_alter_the_image)
     COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
 
-TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
+TEST(resizer, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
 {
     unsigned char in_image[] = {1, 1, 1,
                                 1, 1, 1,
@@ -189,7 +189,7 @@ TEST(dummy, dc_in_gives_same_dc_out_for_scale_of_3_by_2)
     COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
 
-TEST(dummy, upscale_with_crop_for_scale_of_2_by_3)
+TEST(resizer, upscale_with_crop_for_scale_of_2_by_3)
 {
     unsigned char in_image[] = {1, 1, 1,
                                 1, 2, 2,
@@ -208,7 +208,7 @@ TEST(dummy, upscale_with_crop_for_scale_of_2_by_3)
     COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
 
-TEST(dummy, only_crop_implies_a_copy)
+TEST(resizer, only_crop_implies_a_copy)
 {
     unsigned char in_image[] = {1, 1, 1,
                                 1, 2, 3,
@@ -226,7 +226,7 @@ TEST(dummy, only_crop_implies_a_copy)
     COMPARE_IMAGES(out_image, exp_out, 2, 2);
 }
 
-TEST(dummy, very_simple_downscale_for_scale_of_5_by_3)
+TEST(resizer, very_simple_downscale_for_scale_of_5_by_3)
 {
     unsigned char in_image[] = {1, 3, 3, 4, 4,
                                 6, 9, 9, 5, 5,
@@ -247,7 +247,7 @@ TEST(dummy, very_simple_downscale_for_scale_of_5_by_3)
     COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
 
-TEST(dummy, not_so_simple_downscale_for_scale_of_5_by_3)
+TEST(resizer, not_so_simple_downscale_for_scale_of_5_by_3)
 {
     unsigned char in_image[] = {1, 7, 10, 12, 6,
                                 2, 9, 2, 2, 4,
@@ -268,18 +268,37 @@ TEST(dummy, not_so_simple_downscale_for_scale_of_5_by_3)
     COMPARE_IMAGES(out_image, exp_out, 3, 3);
 }
 
+void framer_setup(void)
+{
+}
+
+void framer_cleanup(void)
+{
+}
+
+TEST(framer, dummy_framer_test)
+{
+    CHECK(true);
+}
+
 static void run_all_tests(void)
 {
-    size_t total = sizeof test_functions / sizeof test_functions[0];
+    size_t num_groups = sizeof wrappers / sizeof wrappers[0];
+    size_t num_tests = 0;
 
-    for (size_t i = 0; i < total; ++i) {
-        setup();
-        test_functions[i]();
-        cleanup();
-        printf(".");
+    for (size_t j = 0; j < num_groups; ++j) {
+        struct TestsWrapper *wrapper = wrappers[j];
+
+        for (size_t i = 0; i < wrapper->num_tests; ++i) {
+            wrapper->setup();
+            wrapper->tests[i]();
+            wrapper->cleanup();
+            printf(".");
+            ++num_tests;
+        }
     }
 
-    printf("\nTotal tests: %zu, checks: %zu, failed: %zu \n", total, check_count, failure_count);
+    printf("\nTotal tests: %zu, checks: %zu, failed: %zu \n", num_tests, check_count, failure_count);
 
     if (!failure_count)
         printf("All tests passed\n");
