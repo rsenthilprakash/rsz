@@ -23,6 +23,18 @@ static size_t check_count = 0;
         }                                                               \
     } while(0)
 
+#define CHECK_EQUALS_UNSIGNED_INT(a, b)                                 \
+    do {                                                                \
+        check_count++;                                                  \
+        if (a != b) {                                                   \
+            printf("\n%s: %d \n",  __FUNCTION__, __LINE__);             \
+            printf(#a " == " #b " failed\n");                           \
+            printf("Expected: %u Observed: %d \n", a, b);               \
+            failure_count++;                                            \
+        }                                                               \
+    } while(0)
+
+
 #define COMPARE_IMAGES(out, exp, w, h)                  \
     do {                                                \
         if (!compare_images_fn(out, exp, w, h)) {       \
@@ -299,10 +311,10 @@ TEST(framer, framer_full_crop_has_proper_box)
 
     framer_get_current_crop_in_fixed_pt(framer, &tl_x, &tl_y, &br_x, &br_y);
 
-    CHECK(tl_x == 0);
-    CHECK(tl_y == 0);
-    CHECK(br_x == TO_FP(width - 1));
-    CHECK(br_y == TO_FP(height - 1));
+    CHECK_EQUALS_UNSIGNED_INT(0, tl_x);
+    CHECK_EQUALS_UNSIGNED_INT(0, tl_y);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(width - 1), br_x);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(height - 1), br_y);
 }
 
 TEST(framer, set_a_valid_current_crop)
@@ -321,10 +333,10 @@ TEST(framer, set_a_valid_current_crop)
 
     framer_get_current_crop_in_fixed_pt(framer, &tl_x, &tl_y, &br_x, &br_y);
 
-    CHECK(tl_x == TO_FP(50));
-    CHECK(tl_y == TO_FP(50));
-    CHECK(br_x == TO_FP(1869));
-    CHECK(br_y == TO_FP(1029));
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(50), tl_x);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(50), tl_y);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(1869), br_x);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(1029), br_y);
 }
 
 TEST(framer, framer_set_destination_crop_and_run_for_a_frame)
@@ -345,10 +357,10 @@ TEST(framer, framer_set_destination_crop_and_run_for_a_frame)
 
     framer_get_current_crop_in_fixed_pt(framer, &tl_x, &tl_y, &br_x, &br_y);
 
-    CHECK(tl_x == TO_FP(2));
-    CHECK(tl_y == TO_FP(2));
-    CHECK(br_x == TO_FP(1917.1));
-    CHECK(br_y == TO_FP(1078.8));
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(2), tl_x);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(2), tl_y);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(1917.1), br_x);
+    CHECK_EQUALS_UNSIGNED_INT(TO_FP(1078.8), br_y);
 }
 
 static void run_all_tests(void)
