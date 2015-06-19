@@ -3,12 +3,12 @@
 
 #include <stddef.h>
 
-typedef void (*test_functions_t)(void);
+typedef void (*TestFunctions)(void);
 
 struct TestsWrapper {
     void (*setup)(void);
     void (*cleanup)(void);
-    test_functions_t *tests;
+    TestFunctions *tests;
     size_t num_tests;
 };
 

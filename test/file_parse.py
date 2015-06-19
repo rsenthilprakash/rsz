@@ -37,7 +37,7 @@ for l in list_of_test_groups:
     f.write('void ' + l + '_cleanup(void);\n');
     for t in dict_of_tests[l]:
         f.write('void ' + t + '(void);\n');
-    f.write('test_functions_t ' + l + '_tests[] = {\n')
+    f.write('TestFunctions ' + l + '_tests[] = {\n')
     for t in dict_of_tests[l]:
         f.write('    ' + t + ',\n');
     f.write('};\n')
