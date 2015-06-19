@@ -10,6 +10,9 @@ void framer_destroy(struct Framer *f);
 
 unsigned int framer_get_fixed_point_precision(void);
 
+void framer_set_speed_in_fixed_pt(struct Framer * f, unsigned int speed);
+unsigned int framer_get_speed_in_fixed_pt(const struct Framer * f);
+
 void framer_set_width_and_height(struct Framer *f, unsigned int width, unsigned int height);
 void framer_set_full_crop(struct Framer *f);
 
