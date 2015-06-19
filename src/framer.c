@@ -18,10 +18,10 @@ struct Framer {
     unsigned int dest_tl_y;
     unsigned int dest_br_x;
     unsigned int dest_br_y;
-    unsigned int tl_x_jump;
-    unsigned int tl_y_jump;
-    unsigned int br_x_jump;
-    unsigned int br_y_jump;
+    int tl_x_jump;
+    int tl_y_jump;
+    int br_x_jump;
+    int br_y_jump;
     unsigned int speed;
 };
 
