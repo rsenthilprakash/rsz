@@ -363,6 +363,37 @@ TEST(framer, framer_set_destination_crop_and_run_for_a_frame)
     CHECK_EQUALS_UNSIGNED_INT(TO_FP(1078.8), br_y);
 }
 
+TEST(framer, framer_set_destination_crop_and_destination_not_reached_in_one_frame)
+{
+    unsigned int width = 1920;
+    unsigned int height = 1080;
+
+    framer_set_width_and_height(framer, width, height);
+    framer_set_full_crop(framer);
+
+    CHECK(framer_validate_and_set_destination_crop_in_fixed_pt(framer, TO_FP(100), TO_FP(100), TO_FP(1819), TO_FP(979)) == true);
+
+    framer_compute_current_crop_in_fixed_pt(framer);
+
+    CHECK(framer_is_destination_reached(framer) == false);
+}
+
+TEST(framer, framer_set_destination_crop_and_reach_destination_in_known_number_of_steps)
+{
+    unsigned int width = 1920;
+    unsigned int height = 1080;
+
+    framer_set_width_and_height(framer, width, height);
+    framer_set_full_crop(framer);
+
+    CHECK(framer_validate_and_set_destination_crop_in_fixed_pt(framer, TO_FP(100), TO_FP(100), TO_FP(1819), TO_FP(979)) == true);
+
+    for (unsigned int i = 0; i < 50; i++)
+        framer_compute_current_crop_in_fixed_pt(framer);
+
+    CHECK(framer_is_destination_reached(framer) == true);
+}
+
 static void run_all_tests(void)
 {
     size_t num_groups = sizeof wrappers / sizeof wrappers[0];

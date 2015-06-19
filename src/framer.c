@@ -39,13 +39,13 @@ unsigned int framer_get_fixed_point_precision(void)
     return FIX_FAC;
 }
 
-void framer_set_width_and_height(struct Framer *f, unsigned int width, unsigned int height)
+void framer_set_width_and_height(struct Framer * f, unsigned int width, unsigned int height)
 {
     f->width = width;
     f->height = height;
 }
 
-void framer_set_full_crop(struct Framer *f)
+void framer_set_full_crop(struct Framer * f)
 {
     f->current_tl_x = 0;
     f->current_tl_y = 0;
@@ -77,7 +77,7 @@ static bool is_crop_valid_for_width_and_height(unsigned int width, unsigned int 
 
 }
 
-bool framer_validate_and_set_current_crop_in_fixed_pt(struct Framer *f, unsigned int tl_x, unsigned int tl_y,
+bool framer_validate_and_set_current_crop_in_fixed_pt(struct Framer * f, unsigned int tl_x, unsigned int tl_y,
                                                       unsigned int br_x, unsigned int br_y)
 {
     bool crop_valid = is_crop_valid_for_width_and_height(f->width * FIX_FAC, f->height * FIX_FAC,
@@ -93,8 +93,8 @@ bool framer_validate_and_set_current_crop_in_fixed_pt(struct Framer *f, unsigned
     return crop_valid;
 }
 
-void framer_get_current_crop_in_fixed_pt(const struct Framer *f, unsigned int *tl_x, unsigned int *tl_y,
-                                         unsigned int *br_x, unsigned int *br_y)
+void framer_get_current_crop_in_fixed_pt(const struct Framer * f, unsigned int * tl_x, unsigned int * tl_y,
+                                         unsigned int * br_x, unsigned int * br_y)
 {
     *tl_x = f->current_tl_x;
     *tl_y = f->current_tl_y;
@@ -129,7 +129,7 @@ static unsigned int max4(unsigned int a, unsigned int b, unsigned int c, unsigne
 }
 
 static unsigned int get_max_num_frames_for_jumps(unsigned int diff_1, unsigned int diff_2,
-                                           unsigned int diff_3, unsigned int diff_4)
+                                                 unsigned int diff_3, unsigned int diff_4)
 {
     unsigned int max_diff = max4(diff_1, diff_2, diff_3, diff_4);
 
@@ -143,7 +143,7 @@ static unsigned int get_jump_from_diff_speed_and_dir(unsigned int diff, unsigned
 }
 
 
-bool framer_validate_and_set_destination_crop_in_fixed_pt(struct Framer *f, unsigned int tl_x, unsigned int tl_y,
+bool framer_validate_and_set_destination_crop_in_fixed_pt(struct Framer * f, unsigned int tl_x, unsigned int tl_y,
                                                           unsigned int br_x, unsigned int br_y)
 {
     bool crop_valid = is_crop_valid_for_width_and_height(f->width * FIX_FAC, f->height * FIX_FAC, tl_x, tl_y, br_x, br_y);
@@ -180,4 +180,12 @@ void framer_compute_current_crop_in_fixed_pt(struct Framer * f)
     f->current_tl_y += f->tl_y_jump;
     f->current_br_x += f->br_x_jump;
     f->current_br_y += f->br_y_jump;
+}
+
+bool framer_is_destination_reached(const struct Framer * f)
+{
+    return ((f->current_tl_x == f->dest_tl_x) &&
+            (f->current_tl_y == f->dest_tl_y) &&
+            (f->current_br_x == f->dest_br_x) &&
+            (f->current_br_y == f->dest_br_y));
 }

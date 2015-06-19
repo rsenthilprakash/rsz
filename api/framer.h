@@ -23,4 +23,6 @@ bool framer_validate_and_set_destination_crop_in_fixed_pt(struct Framer *f, unsi
 
 void framer_compute_current_crop_in_fixed_pt(struct Framer * f);
 
+bool framer_is_destination_reached(const struct Framer * f);
+
 #endif
