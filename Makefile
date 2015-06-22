@@ -4,7 +4,9 @@ PYTHON=python
 CFLAGS=-std=c99 -Wall -Werror -Iapi
 
 TESTS_DIR = test
-TESTS_SOURCES = resizer_test.c
+TESTS_SOURCES = resizer_test.c \
+                framer_test.c \
+                TestFirst.c
 
 TESTS_OBJECTS = $(TESTS_SOURCES:%.c=$(BUILD_DIR)/%.o)
 TESTS_DEPENDS = $(TESTS_OBJECTS:.o=.d)
@@ -21,7 +23,7 @@ DEPENDS = $(OBJECTS:.o=.d)
 
 BUILD_DIR = _build
 
-TARGET = $(BUILD_DIR)/resizer_test
+TARGET = $(BUILD_DIR)/TestFirst
 
 QUIET = @
 
@@ -29,7 +31,7 @@ QUIET = @
 all: $(TESTS_HEADER) $(TARGET)
 	./$(TARGET)
 
-$(TESTS_HEADER): $(TESTS_DIR)/$(TESTS_SOURCES) $(TESTS_PARSER_PY)
+$(TESTS_HEADER): $(TESTS_SOURCES:%.c=$(TESTS_DIR)/%.c) $(TESTS_PARSER_PY)
 	@echo GEN $@
 	@$(PYTHON) $(TESTS_PARSER_PY) $(TESTS_DIR) $(TESTS_HEADER)
 
