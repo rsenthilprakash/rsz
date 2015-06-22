@@ -3,6 +3,9 @@ PYTHON=python
 
 CFLAGS=-std=c99 -Wall -Werror -Iapi
 
+VALGRIND = valgrind
+VALGRING_OPTIONS = --tool=memcheck --leak-check=yes
+
 TESTS_DIR = test
 TESTS_SOURCES = resizer_test.c \
                 framer_test.c \
@@ -52,6 +55,10 @@ $(TARGET): $(OBJECTS) $(TESTS_OBJECTS)
 
 -include $(DEPENDS)
 -include $(TESTS_DEPENDS)
+
+.PHONY: mem_check
+mem_check: $(TARGET)
+	$(VALGRIND) $(VALGRING_OPTIONS) ./$(TARGET)
 
 .PHONY: clean
 clean:
