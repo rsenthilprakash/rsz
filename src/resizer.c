@@ -1,5 +1,6 @@
 #include <resizer.h>
 #include "resizer_core.h"
+#include "utils.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -52,27 +53,16 @@ void resizer_set_output_dims(struct Resizer * r, unsigned int width, unsigned in
 bool resizer_validate_and_set_crop(struct Resizer * r, unsigned int tl_x, unsigned int tl_y,
                                    unsigned int br_x, unsigned int br_y)
 {
-    bool crop_valid = true;
-
-    if (tl_x > r->in_width)
-        crop_valid = false;
-    else if (br_x > r->in_width)
-        crop_valid = false;
-    else if (br_x <= tl_x)
-        crop_valid = false;
-    else if (tl_y > r->in_height)
-        crop_valid = false;
-    else if (br_y > r->in_height)
-        crop_valid = false;
-    else if (br_y <= tl_y)
-        crop_valid = false;
-    else {
+    bool crop_valid = is_crop_valid_for_width_and_height(r->in_width, r->in_height,
+                                                         tl_x, tl_y, br_x, br_y);
+    if (crop_valid) {
         r->in_crop_tl_x = tl_x;
         r->in_crop_tl_y = tl_y;
         r->in_crop_br_x = br_x;
         r->in_crop_br_y = br_y;
-        r->crop_valid = true;
     }
+
+    r->crop_valid = crop_valid;
 
     return crop_valid;
 }

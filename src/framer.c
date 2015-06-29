@@ -1,4 +1,5 @@
 #include <framer.h>
+#include "utils.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -67,30 +68,6 @@ void framer_set_full_crop(struct Framer * f)
     f->current_tl_y = 0;
     f->current_br_x = (f->width - 1) * FIX_FAC;
     f->current_br_y = (f->height - 1) * FIX_FAC;
-}
-
-/* TODO: similar logic sits in resizer.c. Try to consolidate */
-static bool is_crop_valid_for_width_and_height(unsigned int width, unsigned int height,
-                                               unsigned int tl_x, unsigned int tl_y,
-                                               unsigned int br_x, unsigned int br_y)
-{
-    bool crop_valid = true;
-
-    if (tl_x > width)
-        crop_valid = false;
-    else if (br_x > width)
-        crop_valid = false;
-    else if (br_x <= tl_x)
-        crop_valid = false;
-    else if (tl_y > height)
-        crop_valid = false;
-    else if (br_y > height)
-        crop_valid = false;
-    else if (br_y <= tl_y)
-        crop_valid = false;
-
-    return crop_valid;
-
 }
 
 bool framer_validate_and_set_current_crop_in_fixed_pt(struct Framer * f, unsigned int tl_x, unsigned int tl_y,

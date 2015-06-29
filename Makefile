@@ -20,6 +20,7 @@ SOURCES_DIR = src
 SOURCES = resizer.c \
           resizer_core.c \
           framer.c \
+          utils.c \
 
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 DEPENDS = $(OBJECTS:.o=.d)
