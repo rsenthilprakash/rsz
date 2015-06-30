@@ -6,15 +6,17 @@ CFLAGS=-std=c99 -Wall -Werror -Iapi
 VALGRIND = valgrind
 VALGRING_OPTIONS = --tool=memcheck --leak-check=yes
 
-TESTS_DIR = test
-TESTS_SOURCES = resizer_test.c \
+BUILD_DIR = _build
+
+UTEST_DIR = unittest
+UTEST_SOURCES = resizer_test.c \
                 framer_test.c \
                 TestFirst.c
 
-TESTS_OBJECTS = $(TESTS_SOURCES:%.c=$(BUILD_DIR)/%.o)
-TESTS_DEPENDS = $(TESTS_OBJECTS:.o=.d)
-TESTS_HEADER = $(TESTS_DIR)/AllTests.h
-TESTS_PARSER_PY = $(TESTS_DIR)/file_parse.py
+UTEST_OBJECTS = $(UTEST_SOURCES:%.c=$(BUILD_DIR)/%.o)
+UTEST_DEPENDS = $(UTEST_OBJECTS:.o=.d)
+UTEST_HEADER = $(UTEST_DIR)/AllTests.h
+UTEST_PARSER_PY = $(UTEST_DIR)/file_parse.py
 
 SOURCES_DIR = src
 SOURCES = resizer.c \
@@ -25,37 +27,35 @@ SOURCES = resizer.c \
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 DEPENDS = $(OBJECTS:.o=.d)
 
-BUILD_DIR = _build
-
-TARGET = $(BUILD_DIR)/TestFirst
+UTEST_TARGET = $(BUILD_DIR)/TestFirst
 
 QUIET = @
 
 .PHONY: all
-all: $(TESTS_HEADER) $(TARGET)
-	./$(TARGET)
+all: $(UTEST_HEADER) $(UTEST_TARGET)
+	./$(UTEST_TARGET)
 
-$(TESTS_HEADER): $(TESTS_SOURCES:%.c=$(TESTS_DIR)/%.c) $(TESTS_PARSER_PY)
+$(UTEST_HEADER): $(UTEST_SOURCES:%.c=$(UTEST_DIR)/%.c) $(UTEST_PARSER_PY)
 	@echo GEN $@
-	@$(PYTHON) $(TESTS_PARSER_PY) $(TESTS_DIR) $(TESTS_HEADER)
+	@$(PYTHON) $(UTEST_PARSER_PY) $(UTEST_DIR) $(UTEST_HEADER)
 
 $(BUILD_DIR)/%.o : $(SOURCES_DIR)/%.c
 	@mkdir -p $(BUILD_DIR)
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MMD -c -o $@ $<
 
-$(BUILD_DIR)/%.o : $(TESTS_DIR)/%.c
+$(BUILD_DIR)/%.o : $(UTEST_DIR)/%.c
 	@mkdir -p $(BUILD_DIR)
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MMD -c -o $@ $<
 
-$(TARGET): $(OBJECTS) $(TESTS_OBJECTS)
+$(UTEST_TARGET): $(OBJECTS) $(UTEST_OBJECTS)
 	@mkdir -p $(BUILD_DIR)
 	@echo LD $@
-	@$(CC) $(OBJECTS) $(TESTS_OBJECTS) -o $@
+	@$(CC) $(OBJECTS) $(UTEST_OBJECTS) -o $@
 
 -include $(DEPENDS)
--include $(TESTS_DEPENDS)
+-include $(UTEST_DEPENDS)
 
 .PHONY: mem_check
 mem_check: $(TARGET)
@@ -64,4 +64,4 @@ mem_check: $(TARGET)
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
-	rm -f $(TESTS_HEADER)
+	rm -f $(UTEST_HEADER)
