@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 static struct Framer * framer;
-unsigned int fpp;
+static unsigned int fpp;
 
 #define TO_FP(x) ((unsigned int)((x) * fpp))
 

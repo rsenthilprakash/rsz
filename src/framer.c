@@ -2,7 +2,6 @@
 #include "utils.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 
 static const unsigned int FIX_FAC = 1000;
 
@@ -154,12 +153,36 @@ bool framer_validate_and_set_destination_crop_in_fixed_pt(struct Framer * f, uns
     return crop_valid;
 }
 
+static inline unsigned int bound_high(unsigned int val, unsigned int bound)
+{
+    return (val > bound) ? bound : val;
+}
+
+static inline unsigned int bound_low(unsigned int val, unsigned int bound)
+{
+    return (val < bound) ? bound : val;
+}
+
+static unsigned int adjust_jump_and_limit_to_dest(unsigned int cur, int jump, unsigned int dest)
+{
+    unsigned int val = cur;
+
+    val += jump;
+
+    if (jump > 0)
+        val = bound_high(val, dest);
+    else
+        val = bound_low(val, dest);
+
+    return val;
+}
+
 void framer_compute_current_crop_in_fixed_pt(struct Framer * f)
 {
-    f->current_tl_x += f->tl_x_jump;
-    f->current_tl_y += f->tl_y_jump;
-    f->current_br_x += f->br_x_jump;
-    f->current_br_y += f->br_y_jump;
+    f->current_tl_x = adjust_jump_and_limit_to_dest(f->current_tl_x, f->tl_x_jump, f->dest_tl_x);
+    f->current_tl_y = adjust_jump_and_limit_to_dest(f->current_tl_y, f->tl_y_jump, f->dest_tl_y);
+    f->current_br_x = adjust_jump_and_limit_to_dest(f->current_br_x, f->br_x_jump, f->dest_br_x);
+    f->current_br_y = adjust_jump_and_limit_to_dest(f->current_br_y, f->br_y_jump, f->dest_br_y);
 }
 
 bool framer_is_destination_reached(const struct Framer * f)
