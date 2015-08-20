@@ -81,8 +81,8 @@ $(FTEST_TARGET): $(OBJECTS) $(FTEST_OBJECTS)
 -include $(FTEST_DEPENDS)
 
 .PHONY: mem_check
-mem_check: $(TARGET)
-	$(VALGRIND) $(VALGRING_OPTIONS) ./$(TARGET)
+mem_check: $(UTEST_TARGET)
+	$(VALGRIND) $(VALGRING_OPTIONS) ./$(UTEST_TARGET)
 
 .PHONY: clean
 clean:

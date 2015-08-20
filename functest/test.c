@@ -72,14 +72,29 @@ static void convert_and_write_png(const unsigned char * yuv_buffer, unsigned int
     free(rgb_buffer);
 }
 
-int main(void)
+int main(int argc, char * argv[])
 {
+    if (argc != 2) {
+        printf("Usage:\n %s <images dir name>\n", argv[0]);
+        return -1;
+    }
+
     unsigned int w = 1920;
     unsigned int h = 1080;
-    const char * yuv_name_in = "../_images/frame.yuv";
-    const char * yuv_name_out = "../_images/frame_out.yuv";
-    const char * png_name_first_frame = "../_images/frame_0.png";
-    const char * png_name_last_frame = "../_images/frame_final.png";
+    const char * no_path_yuv_name_in = "frame.yuv";
+    const char * no_path_yuv_name_out = "frame_out.yuv";
+    const char * no_path_png_name_first_frame = "frame_0.png";
+    const char * no_path_png_name_last_frame = "frame_final.png";
+    char * path = argv[1];
+    char yuv_name_in[100];
+    char yuv_name_out[100];
+    char png_name_first_frame[100];
+    char png_name_last_frame[100];
+
+    sprintf(yuv_name_in, "%s/%s", path, no_path_yuv_name_in);
+    sprintf(yuv_name_out, "%s/%s", path, no_path_yuv_name_out);
+    sprintf(png_name_first_frame, "%s/%s", path, no_path_png_name_first_frame);
+    sprintf(png_name_last_frame, "%s/%s", path, no_path_png_name_last_frame);
 
     unsigned char * in_buffer = malloc((sizeof (*in_buffer) * w * h * 3) / 2);
     unsigned char * int_buffer = malloc((sizeof (*in_buffer) * w * h * 3) / 2);
@@ -118,6 +133,7 @@ int main(void)
 
         framer_get_current_crop_in_fixed_pt(f, &tl_x, &tl_y, &br_x, &br_y);
 
+        printf("%u %u %u %u  ", tl_x, tl_y, br_x, br_y);
         printf("%u %u %u %u\n", tl_x / fpp, tl_y / fpp, br_x / fpp, br_y / fpp);
 
         scale_an_active_region_to_full(y_r, uv_r, int_buffer, in_buffer, w, h,

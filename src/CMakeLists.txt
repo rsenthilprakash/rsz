@@ -1,0 +1,1 @@
+add_library(resizer resizer.c resizer_core.c utils.c framer.c)
