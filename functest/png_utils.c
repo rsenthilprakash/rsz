@@ -2,6 +2,7 @@
 #include <png.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define PNG_DEBUG 3
 
